@@ -12,14 +12,19 @@
 
 package it.polito.tdp.meteo.db;
 
+import it.polito.tdp.meteo.bean.CittaData;
 import it.polito.tdp.meteo.bean.Situazione;
+import it.polito.tdp.meteo.bean.UmiditaCitta;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Classe DAO per l'accesso al database {@code meteo}
@@ -51,7 +56,7 @@ public class MeteoDAO {
 			while (rs.next()) {
 
 				Situazione s = new Situazione(rs.getString("Localita"),
-						rs.getDate("Data"), rs.getInt("Tmedia"),
+						rs.getDate("Data").toLocalDate(), rs.getInt("Tmedia"),
 						rs.getInt("Tmin"), rs.getInt("Tmax"),
 						rs.getInt("Puntorugiada"), rs.getInt("Umidita"),
 						rs.getInt("Visibilita"), rs.getInt("Ventomedia"),
@@ -63,26 +68,82 @@ public class MeteoDAO {
 			return situazioni;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException(e);
+			return null;
 		}
 	}
 
-	/**
-	 * Test method for class {@link MeteoDAO}
-	 * 
-	 * @param args
-	 */
-	public static void main(String args[]) {
-		
-		MeteoDAO dao = new MeteoDAO() ;
-		
-		List<Situazione> list = dao.getAllSituazioni() ;
-		
-		for( Situazione s : list ) {
-			System.out.format("%-10s %2td/%2$2tm/%2$4tY %3d°C-%3d°C  %3d%%  %s\n", 
-					s.getLocalita(), s.getData(), s.getTMin(), s.getTMax(), s.getUmidita(), s.getFenomeni()) ;
+	public List<UmiditaCitta> getUmiditaMedia(Month m){
+		final String sql = "select Localita, avg(umidita) as mediaUmidita from situazione where Month(Data)=? group by Localita";
+		List<UmiditaCitta> list = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getValue());
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				UmiditaCitta u = new UmiditaCitta(rs.getString("localita"), rs.getDouble("mediaUmidita"));
+				list.add(u);
+			}
+			conn.close();
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
 		}
-
 	}
+	
+	public List<String> getElencoCitta(){
+		String sql = "select distinct localita from situazione";
+		List<String> list = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				list.add(rs.getString("localita"));
+			}
+			conn.close();
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Map<CittaData, Double> getElencoUmidita(){
+		String sql = "select localita, data, umidita from situazione";
+		Map<CittaData, Double> map = new HashMap<>();
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				map.put(new CittaData(rs.getString("localita"), rs.getDate("data").toLocalDate()), rs.getDouble("umidita"));
+			}
+			conn.close();
+			return map;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+//	/**
+//	 * Test method for class {@link MeteoDAO}
+//	 * 
+//	 * @param args
+//	 */
+//	public static void main(String args[]) {
+//		
+//		MeteoDAO dao = new MeteoDAO() ;
+//		
+//		List<Situazione> list = dao.getAllSituazioni() ;
+//		
+//		for( Situazione s : list ) {
+//			System.out.format("%-10s %2td/%2$2tm/%2$4tY %3d°C-%3d°C  %3d%%  %s\n", 
+//					s.getLocalita(), s.getData(), s.getTMin(), s.getTMax(), s.getUmidita(), s.getFenomeni()) ;
+//		}
+//
+//	}
 
 }

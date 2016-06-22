@@ -1,11 +1,11 @@
 package it.polito.tdp.meteo.bean;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Situazione {
 	
 	private String localita ; // città
-	private Date data ; 
+	private LocalDate data ; 
 	private int tMedia ; // in °C
 	private int tMin ; // in °C
 	private int tMax ; // in °C
@@ -25,10 +25,10 @@ public class Situazione {
 	public void setLocalita(String localita) {
 		this.localita = localita;
 	}
-	public Date getData() {
+	public LocalDate getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(LocalDate data) {
 		this.data = data;
 	}
 	public int getTMedia() {
@@ -110,7 +110,7 @@ public class Situazione {
 		this.fenomeni = fenomeni;
 	}
 	
-	public Situazione(String localita, Date data, int tMedia, int tMin,
+	public Situazione(String localita, LocalDate data, int tMedia, int tMin,
 			int tMax, int puntoRugiada, int umidita, int visibilita,
 			int ventoMedia, int ventoMax, int raffica, int pressioneSLM,
 			int pressioneMedia, int pioggia, String fenomeni) {

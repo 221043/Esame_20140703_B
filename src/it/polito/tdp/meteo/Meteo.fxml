@@ -21,13 +21,13 @@
             <ChoiceBox fx:id="boxMese">
 
             </ChoiceBox>
-            <Button id="btnCerca" fx:id="btnUmidita" mnemonicParsing="false" text="Umidità" />
+            <Button id="btnCerca" fx:id="btnUmidita" mnemonicParsing="false" onAction="#doUmidita" text="Umidità" />
           </children>
         </HBox>
         <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" spacing="10.0">
           <children>
             <Label text="Sequenza ottimale delle città" />
-            <Button fx:id="btnCalcola" mnemonicParsing="false" text="Calcola" />
+            <Button fx:id="btnCalcola" mnemonicParsing="false" onAction="#doCalcola" text="Calcola" />
           </children>
         </HBox>
         <TextArea fx:id="txtResult" disable="false" editable="false" prefWidth="-1.0" wrapText="true" />
